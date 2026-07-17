@@ -17,12 +17,12 @@ const env = (import.meta as any).env || {};
 
 function getSanitizedConfig() {
   // Start with sensible, verified default fallbacks
-  let apiKey = env.VITE_FIREBASE_API_KEY || "AIzaSyB_AXp2a1CTt0h2VCz3SotqrFdyvxU7iJ0";
-  let authDomain = env.VITE_FIREBASE_AUTH_DOMAIN || "decision-making-ffc61.firebaseapp.com";
-  let projectId = "decision-making-ffc61";
-  let storageBucket = "decision-making-ffc61.firebasestorage.app";
-  let messagingSenderId = "1055105113942";
-  let appId = "1:1055105113942:web:142bebd4465fb9283480f7";
+  let apiKey = env.VITE_FIREBASE_API_KEY || "AIzaSyDgs4qen8xryHdRukxVAqobs0mhlr3VDLs";
+  let authDomain = env.VITE_FIREBASE_AUTH_DOMAIN || "decisionai-a221e.firebaseapp.com";
+  let projectId = "decisionai-a221e";
+  let storageBucket = "decisionai-a221e.firebasestorage.app";
+  let messagingSenderId = "77550815910";
+  let appId = "1:77550815910:web:9f1e0975f77979b0fef6e7";
 
   const rawProjectId = env.VITE_FIREBASE_PROJECT_ID;
   const rawStorageBucket = env.VITE_FIREBASE_STORAGE_BUCKET;

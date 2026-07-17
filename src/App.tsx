@@ -49,8 +49,10 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Autonomous DB Seeder on Page Load
+  // Autonomous DB Seeder on Page Load (runs when user is authenticated)
   useEffect(() => {
+    if (!currentUser) return;
+
     const seedAutonomously = async () => {
       // Check if we already seeded in this session/browser to avoid infinite duplication
       if (localStorage.getItem('boardmind_autonomous_seeded') === 'true') {
@@ -100,7 +102,7 @@ export default function App() {
     };
 
     seedAutonomously();
-  }, []);
+  }, [currentUser]);
 
   // Auth Operations
   const handleAuthSubmit = async (e: React.FormEvent) => {

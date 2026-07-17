@@ -14,8 +14,9 @@ import {
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const resolvedDirname = typeof import.meta !== 'undefined' && import.meta.url 
+  ? path.dirname(fileURLToPath(import.meta.url)) 
+  : (typeof __dirname !== 'undefined' ? __dirname : process.cwd());
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
@@ -672,22 +673,24 @@ Uploaded Documents content snippets: ${documents ? documents.map((d: any) => `Do
 });
 
 // Vite middleware or client delivery integration
-const isProd = process.env.NODE_ENV === 'production';
-if (!isProd) {
-  const { createServer } = await import('vite');
-  const vite = await createServer({
-    server: { middlewareMode: true },
-    appType: 'spa'
-  });
-  app.use(vite.middlewares);
-} else {
-  app.use(express.static(path.join(__dirname, 'dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-  });
-}
+(async () => {
+  const isProd = process.env.NODE_ENV === 'production';
+  if (!isProd) {
+    const { createServer } = await import('vite');
+    const vite = await createServer({
+      server: { middlewareMode: true },
+      appType: 'spa'
+    });
+    app.use(vite.middlewares);
+  } else {
+    app.use(express.static(path.join(resolvedDirname, 'dist')));
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(resolvedDirname, 'dist', 'index.html'));
+    });
+  }
 
-const port = 3000;
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${port}`);
-});
+  const port = 3000;
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on http://0.0.0.0:${port}`);
+  });
+})();

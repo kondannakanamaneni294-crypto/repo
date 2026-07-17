@@ -3,7 +3,7 @@ import {
   Loader2, Sparkles, Brain, Calendar, Check, 
   User, ChevronDown, ChevronUp, FileText, Upload, Trash2, Download,
   Layers, Eye, MoreVertical, Pin, Copy, Edit2, Info, AlertTriangle, TrendingUp, CheckSquare,
-  Wrench, Building
+  Wrench, Building, Send
 } from 'lucide-react';
 import { DB, Business, KnowledgeBase, Decision, ExecutiveMessage, DocumentMeta } from '../services/db';
 import BusinessHealthScorecard from './BusinessHealthScorecard';
@@ -102,6 +102,17 @@ export default function Boardroom({ business, kbase, onDecisionCreated, stateVer
   const [localDocs, setLocalDocs] = useState<DocumentMeta[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Follow-up answer states
+  const [userAnswer, setUserAnswer] = useState('');
+  const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+
+  // Clear answer field on switching active session
+  useEffect(() => {
+    setUserAnswer('');
+    setSaveMessage('');
+  }, [activeSession?.id]);
 
   // Expanded debate card states
   const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({});
@@ -333,6 +344,87 @@ export default function Boardroom({ business, kbase, onDecisionCreated, stateVer
       }, 1500);
     } finally {
       setIsSimulating(false);
+    }
+  };
+
+  const handleSubmitFollowUp = async () => {
+    if (!activeSession || !userAnswer.trim()) return;
+    setIsSubmittingAnswer(true);
+    setSaveMessage('');
+    setError(null);
+    try {
+      const qText = `Original question: "${activeSession.question}"\n\nAdvisory Follow-up Query: "${activeSession.resolution}"\n\nUser's response/clarification: "${userAnswer}"\n\nPlease re-analyze and provide a final updated strategic recommendation considering this clarification.`;
+      
+      const docs = DB.getDocuments().filter(d => d.businessId === business.id);
+      const smartKB = getSmartKnowledgeBase(kbase, qText);
+      const smartDocContext = getSmartDocumentContext(docs, qText);
+      const smartHistory = sessions.filter(s => s.id !== activeSession.id).slice(0, 2).map(s => ({
+        question: s.question,
+        resolution: s.resolution
+      }));
+
+      const response = await fetch('/api/boardroom/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: qText,
+          profile: {
+            id: business.id,
+            name: business.name,
+            industry: business.industry,
+            size: business.size,
+            employees: business.employees,
+            years: business.years,
+            city: business.city,
+            country: business.country
+          },
+          knowledgeBase: smartKB,
+          docContext: smartDocContext,
+          history: smartHistory
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Server failed to update board recommendation');
+      }
+
+      const data = await response.json();
+
+      // Update the active decision with the new output
+      const updatedDec: Decision = {
+        ...activeSession,
+        resolution: data.decision.resolution,
+        reasoning: data.decision.reasoning,
+        risks: data.decision.risks,
+        benefits: data.decision.benefits,
+        confidenceScore: data.decision.confidenceScore || 85,
+        priority: data.decision.priority || 'Medium',
+        resourcesRequired: data.decision.resourcesRequired || [],
+        implementationPlan: data.decision.implementationPlan || [],
+        dialogue: data.dialogue || [],
+        priorityMatrix: data.decision.priorityMatrix
+      };
+
+      await DB.updateDecision(updatedDec);
+      
+      // Update local state lists
+      syncSessionsFromDB();
+      setActiveSession(updatedDec);
+      setUserAnswer('');
+      setSaveMessage('Verdict updated and saved!');
+      setTimeout(() => setSaveMessage(''), 4000);
+      
+      await DB.addNotification(
+        "Advisory Verdict Refined",
+        `Your boardroom decision regarding "${activeSession.question.substring(0, 30)}..." has been successfully refined based on your clarification.`,
+        "success"
+      );
+      if (onDecisionCreated) onDecisionCreated();
+    } catch (err: any) {
+      console.error("Failed to update courtroom/boardroom verdict:", err);
+      setError(err.message || String(err));
+    } finally {
+      setIsSubmittingAnswer(false);
     }
   };
 
@@ -757,9 +849,57 @@ export default function Boardroom({ business, kbase, onDecisionCreated, stateVer
                   <h4 className="text-xs font-black uppercase tracking-wider text-[#1E40AF] mb-2 flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-amber-500" /> Executive Recommendation
                   </h4>
-                  <p className="text-sm md:text-base font-extrabold text-slate-800 leading-relaxed">
+                  <p className="text-sm md:text-base font-extrabold text-slate-800 leading-relaxed mb-4">
                     {activeSession.resolution}
                   </p>
+
+                  {/* Interactive Follow-up Section */}
+                  <div className="mt-4 pt-4 border-t border-blue-100">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-[#1E40AF] mb-2">
+                      Answer Advisory Follow-up Question / Provide Clarification
+                    </label>
+                    <div className="flex flex-col gap-3">
+                      <textarea
+                        value={userAnswer}
+                        onChange={(e) => setUserAnswer(e.target.value)}
+                        placeholder="Provide the missing context or details here to refine your recommendation..."
+                        rows={3}
+                        className="w-full text-xs font-semibold text-slate-700 bg-white border border-blue-100 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent resize-none leading-relaxed shadow-xs placeholder-slate-400"
+                      />
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <span className="text-[10px] text-slate-500 font-semibold">
+                          {saveMessage ? (
+                            <span className="text-emerald-600 font-extrabold flex items-center gap-1 animate-pulse">
+                              ✓ {saveMessage}
+                            </span>
+                          ) : (
+                            "Providing more details allows the boardroom to update its consensus verdict."
+                          )}
+                        </span>
+                        <button
+                          onClick={handleSubmitFollowUp}
+                          disabled={isSubmittingAnswer || !userAnswer.trim()}
+                          className={`px-4 py-2 rounded-xl text-xs font-extrabold text-white transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer self-end ${
+                            isSubmittingAnswer || !userAnswer.trim()
+                              ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                              : 'bg-[#1E40AF] hover:bg-[#1d4ed8]'
+                          }`}
+                        >
+                          {isSubmittingAnswer ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Updating Verdict...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Submit Answer</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Overall Summary & Confidence Meter */}
