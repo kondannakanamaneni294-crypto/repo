@@ -1,0 +1,8 @@
+{
+  "name": "Remix: BoardMind AI",
+  "description": "Your AI Board of Directors for Small \u0026 Medium Businesses. Make smarter strategic decisions with an AI executive team trained on your business documents and context.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

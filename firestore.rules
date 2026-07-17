@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Rules for collections
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    match /businesses/{businessId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.createdBy == request.auth.uid || 
+        !('createdBy' in resource.data)
+      ) && (
+        request.resource == null || 
+        request.resource.data.createdBy == request.auth.uid
+      );
+    }
+
+    match /documents/{docId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.uploadedBy == request.auth.uid || 
+        !('uploadedBy' in resource.data)
+      ) && (
+        request.resource == null || 
+        request.resource.data.uploadedBy == request.auth.uid
+      );
+    }
+
+    match /conversations/{conversationId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.createdBy == request.auth.uid || 
+        !('createdBy' in resource.data)
+      ) && (
+        request.resource == null || 
+        request.resource.data.createdBy == request.auth.uid
+      );
+    }
+
+    match /reports/{reportId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.createdBy == request.auth.uid || 
+        !('createdBy' in resource.data)
+      ) && (
+        request.resource == null || 
+        request.resource.data.createdBy == request.auth.uid
+      );
+    }
+    
+    match /tasks/{taskId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.createdBy == request.auth.uid || 
+        !('createdBy' in resource.data)
+      ) && (
+        request.resource == null || 
+        request.resource.data.createdBy == request.auth.uid
+      );
+    }
+
+    match /notifications/{notifId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.createdBy == request.auth.uid || 
+        !('createdBy' in resource.data)
+      ) && (
+        request.resource == null || 
+        request.resource.data.createdBy == request.auth.uid
+      );
+    }
+
+    match /test/{testId} {
+      allow read, write: if true;
+    }
+
+    match /businessProfiles/{profileId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /financialMetrics/{metricId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

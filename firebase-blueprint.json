@@ -1,0 +1,72 @@
+{
+  "collections": {
+    "users": {
+      "schema": {
+        "uid": "string",
+        "name": "string",
+        "email": "string",
+        "photoURL": "string?",
+        "createdAt": "timestamp",
+        "lastLogin": "timestamp",
+        "businessId": "string?"
+      }
+    },
+    "businesses": {
+      "schema": {
+        "businessName": "string",
+        "industry": "string",
+        "businessSize": "string",
+        "location": "string",
+        "employees": "string",
+        "annualRevenue": "string",
+        "businessDescription": "string?",
+        "createdBy": "string",
+        "createdAt": "timestamp",
+        "updatedAt": "timestamp",
+        "goals": "array<string>",
+        "challenges": "array<string>",
+        "products": "array<string>",
+        "customers": "array<string>",
+        "competitors": "array<string>",
+        "summary": "string?"
+      }
+    },
+    "documents": {
+      "schema": {
+        "documentId": "string",
+        "businessId": "string",
+        "fileName": "string",
+        "fileType": "string",
+        "downloadURL": "string",
+        "storagePath": "string",
+        "uploadedAt": "timestamp",
+        "uploadedBy": "string",
+        "size": "string",
+        "content": "string",
+        "summary": "string?"
+      }
+    },
+    "conversations": {
+      "schema": {
+        "conversationId": "string",
+        "businessId": "string",
+        "question": "string",
+        "mode": "string",
+        "solution": "string",
+        "debate": "string",
+        "confidence": "number",
+        "createdAt": "timestamp"
+      }
+    },
+    "reports": {
+      "schema": {
+        "reportId": "string",
+        "businessId": "string",
+        "conversationId": "string",
+        "reportTitle": "string",
+        "reportUrl": "string",
+        "createdAt": "timestamp"
+      }
+    }
+  }
+}
