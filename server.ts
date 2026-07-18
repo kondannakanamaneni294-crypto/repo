@@ -171,7 +171,9 @@ You MUST follow this exact reasoning process internally before answering:
 3. Retrieve relevant data from the Knowledge Base (KPIs, Strengths, Pricing, Competitors, Suppliers).
 4. Retrieve relevant snippets from uploaded documents.
 5. Reason step-by-step through the problem without using consultant jargon, MBA terminology, or flowery AI language. Use short, simple sentences and highly practical advice.
-6. Mention the user's own business, products, or specific metrics (from setup/documents) to personalize the advice.
+6. Frame your recommendation ("resolution") and "implementationPlan" as a highly actionable, sequences-based guide/manual.
+7. Provide concrete real-world resourced support. This means specifically recommending real-world software tools, standard government/industry registries/databases, standard framework templates (e.g., standard SOP template patterns, specific templates, or checklists), public assistance programs, or accessible industry-standard directories they should leverage.
+8. Mention the user's own business, products, or specific metrics (from setup/documents) to personalize the advice.
 
 CRITICAL: If you lack critical information/context to answer the user's question confidently:
 - You must ask a targeted follow-up question instead of guessing.
@@ -181,6 +183,7 @@ CRITICAL: If you lack critical information/context to answer the user's question
 
 If you have enough information:
 - Provide high-quality, practical recommendations.
+- Ensure the "resolution" functions as a step-by-step guide with real-world resourced support (naming specific tools, websites, templates, or databases).
 - Keep sentences short. Avoid MBA-speak.
 - Generate dialogue for CEO Marcus Sterling (focusing on strategy and growth, 1-2 short sentences) and CFO Clara Vance (focusing on margins, financial costs, and cash flow, 1-2 short sentences).
 
@@ -191,19 +194,19 @@ The output MUST be valid JSON matching this schema exactly (no markdown wrapping
     { "role": "CFO", "name": "Clara Vance", "speech": "Cost/margin/financial comment (1-2 short sentences)." }
   ],
   "decision": {
-    "resolution": "Crisp direct final recommendation or follow-up question (2-3 simple sentences).",
-    "reasoning": ["Practical reason 1", "Practical reason 2"],
+    "resolution": "Step-by-step implementation guide with real-world resourced support (3-4 sentences outlining specific actions and naming real tools/templates/resources).",
+    "reasoning": ["Practical reason 1 backed by real-world resources", "Practical reason 2 backed by real-world resources"],
     "benefits": ["Benefit 1", "Benefit 2"],
     "risks": ["Risk 1", "Risk 2"],
     "confidenceScore": 90,
     "priority": "High" | "Medium" | "Low",
     "resourcesRequired": [
-      { "name": "Resource name", "reason": "Why needed", "estimatedCost": "Cost", "priority": "High" | "Medium" | "Low" }
+      { "name": "Specific real-world tool/template/resource name", "reason": "Why needed to implement this step", "estimatedCost": "Realistic cost or Free", "priority": "High" | "Medium" | "Low" }
     ],
-    "implementationPlan": ["Simple verb action 1", "Simple verb action 2"],
+    "implementationPlan": ["Step 1: Specific action with standard template/tool", "Step 2: Specific action with tool/database"],
     "priorityMatrix": {
-      "quickWins": ["Easy high-ROI task"],
-      "majorProjects": ["Hard high-ROI project"],
+      "quickWins": ["Easy high-ROI task using accessible resource"],
+      "majorProjects": ["Hard high-ROI project requiring real-world software/framework"],
       "fillIns": ["Easy low-ROI task"],
       "thanklessTasks": ["Hard low-ROI task"]
     }
@@ -450,12 +453,14 @@ You are the quantitative simulation engine of BoardMind AI.
 Analyze this "What If" scenario: "${scenario}" for "${profile.name}" (${profile.industry} industry).
 Rely on their profile and knowledge base to customize financial, operational, and risk projections. Keep language crisp, direct, and straightforward.
 
+IMPORTANT: The "recommendation" and "financialImpact" fields MUST be framed as a step-by-step implementation guide with real-world resourced support. This means specifically recommending and naming real-world software, standard government or industry registries/databases, standard templates (such as specific SOP formats, guidelines, or checklists), public financial assistance programs, or accessible industry-standard directories they should leverage.
+
 Return exactly this JSON schema (no markdown):
 {
-  "financialImpact": "A detailed 1-paragraph projection of revenue, costs, and upfront investment.",
+  "financialImpact": "A detailed 1-paragraph projection of revenue, costs, and upfront investment, citing specific software tools or standard templates to model this.",
   "benefits": ["Personalised benefit 1", "Personalised benefit 2"],
   "risks": ["Personalised risk 1", "Personalised risk 2"],
-  "recommendation": "Direct proceed/avoid advisory statement.",
+  "recommendation": "Step-by-step proceed/avoid guide statement citing specific resources, websites, databases, or templates they should use.",
   "metrics": [
     { "name": "Revenue Change", "change": "+5% to +10%", "direction": "up" },
     { "name": "Profit Margin", "change": "-2%", "direction": "down" },
@@ -509,9 +514,11 @@ Generate a structured, board-ready Strategic Review Report for:
 
 Keep descriptions direct, crisp, and extremely specific to their business, industry, and strategic context.
 
+IMPORTANT: All recommendations, risk analyses/mitigations, and priority matrices MUST be framed as highly practical step-by-step guides with real-world resourced support. This means specifically recommending and naming real-world software tools, standard government/industry registries/databases, standard framework templates (e.g., standard SOP template patterns, specific templates, or checklists), public assistance programs, or accessible industry-standard directories they should leverage.
+
 Return exactly this JSON schema (no markdown):
 {
-  "executiveSummary": "1-2 paragraphs of clear strategic direction and core board directives.",
+  "executiveSummary": "1-2 paragraphs of clear strategic direction and core board directives framed as an implementation guide.",
   "problem": "Operational bottlenecks and main issues facing the business.",
   "discussion": "Summary of active boardroom conversations discussing margins and positioning.",
   "swot": {
@@ -520,17 +527,17 @@ Return exactly this JSON schema (no markdown):
     "opportunities": ["...", "..."],
     "threats": ["...", "..."]
   },
-  "riskAnalysis": "Analysis of operational, financial, and competitor risks with direct mitigations.",
-  "recommendations": ["Initiative 1", "Initiative 2", "Initiative 3"],
+  "riskAnalysis": "Analysis of operational, financial, and competitor risks with direct mitigations listing specific real-world resources to manage the risk.",
+  "recommendations": ["Step-by-step initiative 1 with real-world software/framework", "Step-by-step initiative 2 with specific guide resource", "Step-by-step initiative 3 with accessible template/tool"],
   "priorityMatrix": {
-    "quickWins": ["Easy high-value action"],
-    "majorProjects": ["Harder high-value project"],
+    "quickWins": ["Easy high-value action using real-world tools/templates"],
+    "majorProjects": ["Harder high-value project requiring real-world software/framework"],
     "fillIns": ["Easy lower priority task"],
     "thanklessTasks": ["Hard low return task to avoid"]
   },
-  "plan30Day": ["Task 1", "Task 2"],
-  "plan90Day": ["Milestone 1", "Milestone 2"],
-  "plan1Year": ["Goal 1", "Goal 2"],
+  "plan30Day": ["Step 1 with named tool/resource", "Step 2 with named tool/resource"],
+  "plan90Day": ["Milestone 1 with named tool/resource", "Milestone 2 with named tool/resource"],
+  "plan1Year": ["Goal 1 with named tool/resource", "Goal 2 with named tool/resource"],
   "charts": {
     "health": [
       { "name": "Finance", "score": 75 },
