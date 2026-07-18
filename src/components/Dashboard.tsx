@@ -212,7 +212,7 @@ export default function Dashboard({ onLogout, onPurge }: DashboardProps) {
   };
 
   // Check if the Knowledge Base has been fully analyzed and compiled (either demo or completed onboarding)
-  const isKBaseComplete = business.id === 'demo-01' || (kbase.vision !== undefined && !kbase.businessSummary.includes("Actively completing AI onboarding"));
+  const isKBaseComplete = business.id?.startsWith('demo-01') || (kbase.vision !== undefined && !kbase.businessSummary.includes("Actively completing AI onboarding"));
 
   // Nav Links Configuration
   const menuItems = [

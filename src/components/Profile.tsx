@@ -90,7 +90,7 @@ export default function Profile({ business, kbase, onUpdate }: ProfileProps) {
         <div className="space-y-6">
           
           {/* Incomplete warning banner */}
-          {!(business.id === 'demo-01' || (kbase.vision !== undefined && !kbase.businessSummary.includes("Actively completing AI onboarding"))) && (
+          {!(business.id?.startsWith('demo-01') || (kbase.vision !== undefined && !kbase.businessSummary.includes("Actively completing AI onboarding"))) && (
             <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-6 space-y-2">
               <h4 className="text-xs font-black text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" /> AI Knowledge Base Compiler In Progress

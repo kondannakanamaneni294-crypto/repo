@@ -690,9 +690,10 @@ Uploaded Documents content snippets: ${documents ? documents.map((d: any) => `Do
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.join(resolvedDirname, 'dist')));
+    const distPath = path.join(process.cwd(), 'dist');
+    app.use(express.static(distPath));
     app.get('*', (req, res) => {
-      res.sendFile(path.join(resolvedDirname, 'dist', 'index.html'));
+      res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 

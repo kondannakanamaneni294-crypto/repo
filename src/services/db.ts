@@ -1606,7 +1606,7 @@ export const DB = {
 
   // 1-Click Load Demo directly into Firestore
   async loadDemoDataIntoFirestore(userId: string): Promise<void> {
-    const bizId = 'demo-01';
+    const bizId = 'demo-01-' + userId;
 
     const bizDoc = {
       businessName: DEMO_BUSINESS.name,
@@ -1626,7 +1626,7 @@ export const DB = {
       competitors: ['Large Coffee Franchise 2 blocks away', 'Other boutique independent coffee shops'],
       summary: DEMO_KBASE.businessSummary,
       
-      rawBusiness: DEMO_BUSINESS,
+      rawBusiness: { ...DEMO_BUSINESS, id: bizId },
       rawKnowledgeBase: DEMO_KBASE
     };
 
@@ -1657,38 +1657,43 @@ export const DB = {
 
       // Seed conversations
       DEMO_DECISIONS.forEach(dec => {
-        batch.set(doc(db, 'conversations', dec.id), {
-          conversationId: dec.id,
+        const customDecId = dec.id + '-' + userId;
+        const customDec = { ...dec, id: customDecId, businessId: bizId };
+        batch.set(doc(db, 'conversations', customDecId), {
+          conversationId: customDecId,
           businessId: bizId,
-          question: dec.question,
+          question: customDec.question,
           mode: 'standard',
-          solution: dec.resolution,
-          debate: JSON.stringify(dec.dialogue),
-          confidence: dec.confidenceScore,
-          createdAt: dec.createdAt,
+          solution: customDec.resolution,
+          debate: JSON.stringify(customDec.dialogue),
+          confidence: customDec.confidenceScore,
+          createdAt: customDec.createdAt,
           createdBy: userId,
-          rawDecision: dec
+          rawDecision: customDec
         });
       });
 
       // Seed reports
       DEMO_REPORTS.forEach(rep => {
-        batch.set(doc(db, 'reports', rep.id), {
-          reportId: rep.id,
+        const customRepId = rep.id + '-' + userId;
+        const customRep = { ...rep, id: customRepId, businessId: bizId };
+        batch.set(doc(db, 'reports', customRepId), {
+          reportId: customRepId,
           businessId: bizId,
           conversationId: '',
           reportTitle: 'Mid-Year Board Advisory Report',
           reportUrl: '',
           createdAt: rep.createdAt,
           createdBy: userId,
-          rawReport: rep
+          rawReport: customRep
         });
       });
 
       // Seed tasks
       DEMO_TASKS.forEach(t => {
-        batch.set(doc(db, 'tasks', t.id), {
-          id: t.id,
+        const customTaskId = t.id + '-' + userId;
+        batch.set(doc(db, 'tasks', customTaskId), {
+          id: customTaskId,
           businessId: bizId,
           title: t.title,
           status: t.status,
@@ -1701,8 +1706,9 @@ export const DB = {
 
       // Seed notifications
       DEMO_NOTIFS.forEach(n => {
-        batch.set(doc(db, 'notifications', n.id), {
-          id: n.id,
+        const customNotifId = n.id + '-' + userId;
+        batch.set(doc(db, 'notifications', customNotifId), {
+          id: customNotifId,
           businessId: bizId,
           title: n.title,
           message: n.message,
@@ -1719,12 +1725,12 @@ export const DB = {
     }
 
     // Force refresh cached variables
-    cachedBusiness = DEMO_BUSINESS;
+    cachedBusiness = { ...DEMO_BUSINESS, id: bizId };
     cachedKBase = DEMO_KBASE;
-    cachedDecisions = DEMO_DECISIONS;
-    cachedReports = DEMO_REPORTS;
-    cachedTasks = DEMO_TASKS;
-    cachedNotifs = DEMO_NOTIFS;
+    cachedDecisions = DEMO_DECISIONS.map(dec => ({ ...dec, id: dec.id + '-' + userId, businessId: bizId }));
+    cachedReports = DEMO_REPORTS.map(rep => ({ ...rep, id: rep.id + '-' + userId, businessId: bizId }));
+    cachedTasks = DEMO_TASKS.map(t => ({ ...t, id: t.id + '-' + userId, businessId: bizId }));
+    cachedNotifs = DEMO_NOTIFS.map(n => ({ ...n, id: n.id + '-' + userId, businessId: bizId }));
     cachedDocs = [];
     this.clearDiscoveryChat();
   },
